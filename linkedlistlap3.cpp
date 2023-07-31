@@ -16,14 +16,20 @@ product *initnode(char *, int);
 void printnode(product *);
 void printlist(product *);
 void add(product *);
+void *printlistid(product *);
 product *searchname(product *, char *);
 void deletenode(product *);
 void insertnode(product *);
 void deletelist(product *);
+product *searchid(product *);
+void id(product *);
+/*function prototupes*/
 
-product *head = NULL;
-product *end = NULL;
+/*head,end = Null */
+product *head, *end = NULL;
+/*--------------------*/
 
+/*prooduct initnode */
 product *initnode(int id, char *name, double price)
 {
    product *ptr = new product;
@@ -31,13 +37,22 @@ product *initnode(int id, char *name, double price)
    strcpy(ptr->name, name);
    ptr->price = price;
    return (ptr);
-}
+} /*ptr -> id name price*/
 
+int compare(const void *a, const void *b)
+{
+   const product *productA = *(const product **)a;
+   const product *productB = *(const product **)b;
+   return productA->id - productB->id;
+}
+/*printnode id name price */
 void printnode(product *ptr)
 {
    printf("ID: %d\tName: %s\tPrice: %.2f\n", ptr->id, ptr->name, ptr->price);
 }
+/*end print*/
 
+/*printlist product */
 void printlist(product *ptr)
 {
    if (ptr == NULL)
@@ -48,49 +63,7 @@ void printlist(product *ptr)
       ptr = ptr->next;
    }
 }
-
-int compare(const void *a, const void *b)
-{
-   const product *productA = *(const product **)a;
-   const product *productB = *(const product **)b;
-   return productA->id - productB->id;
-}
-
-void printlistid(product *ptr)
-{
-   if (ptr == NULL)
-      return;
-
-   // นับจำนวนโหนดทั้งหมดในรายการ
-   int count = 0;
-   product *currentNode = ptr;
-   while (currentNode != NULL)
-   {
-      count++;
-      currentNode = currentNode->next;
-   }
-
-   // สร้างอาร์เรย์เก็บตัวแปร pointer ไปยังโหนดในรายการ
-   product **nodeArray = (product **)malloc(count * sizeof(product *));
-   currentNode = ptr;
-   for (int i = 0; i < count; i++)
-   {
-      nodeArray[i] = currentNode;
-      currentNode = currentNode->next;
-   }
-
-   // เรียงลำดับอาร์เรย์ของโหนดตาม id
-   qsort(nodeArray, count, sizeof(product *), compare);
-
-   // พิมพ์โหนดตามลำดับที่เรียงแล้ว
-   for (int i = 0; i < count; i++)
-   {
-      printnode(nodeArray[i]);
-   }
-
-   free(nodeArray);
-}
-
+/*add product*/
 void add(product *newptr)
 {
    if (head == NULL)
@@ -102,8 +75,38 @@ void add(product *newptr)
       end->next = newptr;
    }
    end = newptr;
+} /*add */
+void printsortid(product *ptr)
+{
+   if (ptr == NULL)
+      return;
+   // นับจำนวนโหนดทั้งหมดในรายการ
+   int countnode = 0;
+   product *currentNode = ptr;
+   while (currentNode != NULL)
+   {
+      countnode++;
+      currentNode = currentNode->next;
+   }
+   // สร้างอาร์เรย์เก็บตัวแปร pointer ไปยังโหนดในรายการ
+   product **nodeArray = (product **)malloc(countnode * sizeof(product *));
+   currentNode = ptr;
+   for (int i = 0; i < countnode; i++)
+   {
+      nodeArray[i] = currentNode;
+      currentNode = currentNode->next;
+   }
+   // เรียงลำดับอาร์เรย์ของโหนดตาม id
+   qsort(nodeArray, countnode, sizeof(product *), compare);
+   // พิมพ์โหนดตามลำดับที่เรียงแล้ว
+   for (int i = 0; i < countnode; i++)
+   {
+      printnode(nodeArray[i]);
+   }
+   free(nodeArray);
 }
 
+/*searchanme product*/
 product *searchname(product *ptr, char *name)
 {
    while (strcmp(name, ptr->name) != 0)
@@ -113,15 +116,9 @@ product *searchname(product *ptr, char *name)
          break;
    }
    return (ptr);
-}
+} /*end searchnaem*/
 
-/*product *searchid(product *ptr, int id) {
-   while (ptr != NULL && ptr->id != id) {
-      ptr = ptr->next;
-   }
-   return ptr;
-}*/
-
+/*deletnode product*/
 void deletenode(product *ptr)
 {
    product *tmp, *prv;
@@ -147,8 +144,8 @@ void deletenode(product *ptr)
          end = prv;
       delete (tmp);
    }
-}
-
+} /*end delete*/
+/*insertnode*/
 void insertnode(product *newptr)
 {
    product *tmp, *prv;
@@ -183,7 +180,8 @@ void insertnode(product *newptr)
          end = newptr;
    }
 }
-
+/*end insertnode*/
+/*deletelist*/
 void deletelist(product *ptr)
 {
    product *temp;
@@ -197,12 +195,15 @@ void deletelist(product *ptr)
       ptr = temp;
    }
 }
+/*end deletelist*/
+/*searcid product*/
 product *searchid(product *ptr, int id)
 {
    while (ptr != NULL)
    {
       if (ptr->id == id)
          return ptr;
+
       ptr = ptr->next;
    }
    return NULL;
@@ -211,12 +212,11 @@ void id(product *ptr)
 {
    printf("Product IDs:\n");
    while (ptr != NULL)
-   {
       printf("ID: %d\n", ptr->id);
-      ptr = ptr->next;
-   }
+   ptr = ptr->next;
 } /*stop funtionsearch id */
 
+/*menu app*/
 int main()
 {
    int id;
@@ -228,15 +228,18 @@ int main()
    while (ch != 0)
    {
       system("cls");
-      printf("1 add a name \n");
-      printf("2 delete a name \n");
-      printf("3 list all names \n");
-      printf("4 search for name \n");
-      printf("5 insert a name \n");
-      printf("6 search for id\n");
-      printf("7 list all id\n");
-      printf("0 quit\n");
-      printf("Please select menu: ");
+      printf("MENU APPPRODUCT\t\n");
+      printf("\n");
+      printf("\tMENU 1 add a name \n");
+      printf("\tMENU 2 delete a name \n");
+      printf("\tMENU 3 list all names \n");
+      printf("\tMENU 4 search for name \n");
+      printf("\tMENU 5 insert a name \n");
+      printf("\tMENU 6 search for id\n");
+      printf("\tMENU 7 list all id\n");
+      printf("\tMENU 0 quit-Menu\n");
+      printf("\n");
+      printf("Please select menu : ");
       scanf("%d", &ch);
 
       switch (ch)
@@ -269,6 +272,7 @@ int main()
       case 3:
          printlist(head);
          getch();
+
          break;
 
       case 4:
@@ -311,10 +315,10 @@ int main()
          getch();
          break; /*stop end case 6 funtion search ID*/
       case 7:
-         printlistid(head);
+         printsortid(head);
          getch();
          break;
       }
    }
    deletelist(head);
-}//github 
+} /*end menu app*/ // github
